@@ -1,4 +1,4 @@
-#EJERCICIO 3
+# EJERCICIO 3
 
 ingreso=float(input("Introduce el ingreso"))
 impuesto=.0
