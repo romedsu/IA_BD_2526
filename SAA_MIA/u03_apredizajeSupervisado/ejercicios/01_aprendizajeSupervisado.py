@@ -423,7 +423,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error,r2_score
-from sklearn.preprocessing import StandardScaler
+# from sklearn.preprocessing import StandardScaler
 
 
 # b)
@@ -527,3 +527,63 @@ l)	Muestra por pantalla todos los valores (MedInc, HouseAge, AveRooms,etc) a los
     se pueden acceder mediante el método modelo.coef_
 
 '''
+
+# G --<StandardScaler>--
+
+print("\n -----STANDARDSCALER ----")
+from sklearn.preprocessing import StandardScaler
+
+scaler= StandardScaler()
+
+# SOLO 1 DATO POR FIT_TRANSFORM
+X_train_scaler =scaler.fit_transform(X_train)
+
+# sin fit el de X_TEST (solo transform)
+X_test_scaler =scaler.transform(X_test)
+
+# print(X_train_std)
+
+# print(X_test_std)
+
+
+
+# %% H - LINEAR REGRESSION
+from sklearn import linear_model 
+
+modelo =linear_model.LinearRegression()
+
+
+modelo.fit(X_train_scaler,Y_train) 
+
+
+w = modelo.coef_ 
+b = modelo.intercept_ 
+print(f"\nPrimer coeficiente (w1): {w[0]}") 
+print(f"Intercepto (b): {b}")
+
+
+
+#%% I 
+
+prediccionTest = modelo.predict(X_test_scaler)
+
+# %% J
+mse = mean_squared_error(Y_test,prediccionTest)
+
+
+print(f'\n MSE \n{mse}')
+
+
+# %% K
+
+coef_determinacion =r2_score(Y_test,prediccionTest)
+
+print(f'\n coeficiente_determinacion \n{coef_determinacion}')
+
+
+
+# %%L
+for dato in modelo.coef_:
+    print(dato)
+
+
