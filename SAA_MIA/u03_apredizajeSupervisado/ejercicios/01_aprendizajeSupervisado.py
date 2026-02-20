@@ -639,6 +639,8 @@ from sklearn.linear_model import LogisticRegression
 
 from sklearn.metrics import accuracy_score,classification_report,confusion_matrix
 
+import matplotlib.pyplot as plt
+
 # B)
 datosIris=datasets.load_iris()
 
@@ -683,3 +685,133 @@ X_train,X_test,Y_train,Y_test= train_test_split(X,
                                                 Y,
                                                 test_size=0.2,
                                                 random_state=42)
+
+
+
+# %% 27 B
+
+'''
+g) Aplica una normalización utilizando StandardScaler:
+    • Crea una instancia llamada scaler
+    
+    • Ajusta y transforma los datos de entrenamiento con: 
+        escalaAjusteEntrenamiento = scaler.fit_transform(X_train)
+        
+    • Transforma los datos de prueba con: escalaAjustePrueba = scaler.transform(X_test)
+ 
+h) Crea la variable ‘modelo’ como una instancia de LogisticRegression() 
+    y entrena modelo usando modelo.fit(escalaAjusteEntrenamiento, y_train)
+ 
+i) Realiza las predicciones sobre el conjunto de prueba utilizando:
+    predicionesPrueba = modelo.predict(escalaAjustePrueba)
+ 
+j) Evalúa la precisión del modelo calculando la variable accuracy usando:
+    accuracy_score(y_test, predicionesPrueba) y mostrándola por pantalla.
+ 
+k) Genera y muestra el informe de clasificación usando: 
+    classification_report(y_test, predicionesPrueba) y la matriz de confusión
+    almacenándola en una variable llamada matrizConfusion usando: 
+        confusion_matrix(y_test, predicionesPrueba)
+ 
+l) Visualización de la frontera de decisión (solo si el número de características es 2):
+    • Crea una malla de puntos usando este código:
+        x_min, x_max = X_scaled[:, 0].min() - 1, X_scaled[:, 0].max() + 1
+        y_min, y_max = X_scaled[:, 1].min() - 1, X_scaled[:, 1].max() + 1
+        xx, yy = np.meshgrid(np.linspace(x_min, x_max, 200), np.linspace(y_min, y_max, 200))
+        
+    • Predice las clases sobre la malla con este código
+        Z = modelo.predict(np.c_[xx.ravel(), yy.ravel()])
+        Z = Z.reshape(xx.shape)
+ 
+m)  Usa plt.contourf() para dibujar la superficie, plt.scatter() para representar
+    los puntos de entrenamiento y añade etiquetas a los ejes
+    y un título con plt.xlabel() y plt.title()
+    
+'''
+
+
+# G) STANDARSCALER (normalizacion) (aprende media y desviacion tipica y despues lo transforma)
+
+scaler= StandardScaler()
+
+escalaAjusteEntrenamiento= scaler.fit_transform(X_train)
+
+escalaAjustePrueba= scaler.transform(X_test)
+
+
+
+# H) MODELO (crear y entrenar)
+
+# modelo= linear_model.LogisticRegression()
+
+modelo= LogisticRegression()
+
+modelo.fit(escalaAjusteEntrenamiento,Y_train)
+
+
+
+#I) PREDICCIONES
+
+predicionesPrueba= modelo.predict(escalaAjustePrueba)
+
+print(f'\n predicionesPrueba: \n {predicionesPrueba}')
+
+
+    
+# J) PRECISION modelo (ACCURACY)
+
+precision=accuracy_score(Y_test, predicionesPrueba)
+
+print(f'\n PRECISION accuracy_score: \n {precision}')
+
+
+
+
+# K) INFORME CLASIFICACION
+
+informe= classification_report(Y_test, predicionesPrueba)
+print(f'\n INFORME CLASIFICACION: \n {informe}')
+
+
+
+
+# K b) NATRIZ CONFUSION
+
+matrizConfusion= confusion_matrix(Y_test, predicionesPrueba)
+
+print(f'\n MATRIZ CONFUSION: \n {matrizConfusion}')
+
+
+# L) FRONTERA de DECISION (sobre el escalado (standarScaler) del X_train)
+x_min, x_max = escalaAjusteEntrenamiento[:, 0].min() - 1, escalaAjusteEntrenamiento[:, 0].max() + 1
+
+
+y_min, y_max = escalaAjusteEntrenamiento[:, 1].min() - 1, escalaAjusteEntrenamiento[:, 1].max() + 1
+
+xx, yy = np.meshgrid(np.linspace(x_min, x_max, 200), np.linspace(y_min, y_max, 200))
+
+
+# PREDICCION de CLASES sobre malla
+Z = modelo.predict(np.c_[xx.ravel(), yy.ravel()])
+Z = Z.reshape(xx.shape)
+
+print(f'\n Z: \n {Z}')
+
+
+
+# M) PLT (graficos)
+plt.contourf(xx, yy, Z, alpha=0.3, cmap='viridis')
+
+plt.scatter(escalaAjusteEntrenamiento[:, 0], 
+            escalaAjusteEntrenamiento[:, 1], 
+            c=Y_train, 
+            edgecolors='k', 
+            cmap='viridis')
+
+
+plt.xlabel('Sepal length (estandarizado)')
+plt.ylabel('Sepal width (estandarizado)')
+plt.title('Fronteras de Decisión: Regresión Logística (Iris)')
+
+plt.show()
+
