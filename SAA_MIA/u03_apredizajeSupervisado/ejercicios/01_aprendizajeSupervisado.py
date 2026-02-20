@@ -587,3 +587,99 @@ for dato in modelo.coef_:
     print(dato)
 
 
+# %% EJERCICIO 27
+
+'''
+27 Desarrolla un modelo de clasificación mediante Regresión Logística para predecir 
+la especie de flor Iris utilizando únicamente el largo y el ancho del sépalo.
+En este ejercicio vas a construir un modelo de clasificación supervisada usando
+ el dataset load_iris() de scikit-learn. El objetivo es entrenar 
+ un modelo de Regresión Logística, evaluarlo con métricas de clasificación y
+ visualizar su frontera de decisión.
+ 
+a) Importa las siguientes librerías:
+• numpy como np
+• pandas como pd
+• load_iris desde sklearn.datasets
+• train_test_split desde sklearn.model_selection
+• LogisticRegression desde sklearn.linear_model
+• StandardScaler desde sklearn.preprocessing
+• accuracy_score, classification_report y confusion_matrix desde sklearn.metrics
+• matplotlib.pyplot como plt
+ 
+b) Carga el dataset Iris en una variable llamada datosIris utilizando:
+datosIris = load_iris()
+ 
+c) Crea un DataFrame llamado dfIris con:
+• Las variables predictoras usando datosIris.data
+• Los nombres de columnas usando datosIris.feature_names
+Añade una nueva columna llamada target usando: dfIris['target'] = datosIris.target
+ 
+d) Crea un array llamado caracteristicas con las siguientes 
+    variables independientes:  'sepal length (cm)' y  'sepal width (cm)'
+ 
+e) Separa el conjunto de datos en: variable X con dfIris[caracteristicas] y 
+    variable y con dfIris['target']
+ 
+f) Divide los datos en conjunto de entrenamiento y prueba utilizando:
+    train_test_split(X, y, test_size=0.2, random_state=42)
+    
+'''
+# A)
+import numpy as np
+import pandas as pd
+
+from sklearn.datasets import load_iris
+
+from sklearn.model_selection import train_test_split
+
+from sklearn.preprocessing import StandardScaler
+
+from sklearn.linear_model import LogisticRegression
+
+from sklearn.metrics import accuracy_score,classification_report,confusion_matrix
+
+# B)
+datosIris=datasets.load_iris()
+
+
+
+# C) CREAR DATASET
+dfIris= pd.DataFrame(datosIris.data,
+                     columns=datosIris.feature_names)
+
+print(f'\n dfIris \n {dfIris.head()}')
+
+
+
+
+# OBJETIVO nueva columna
+dfIris['target']=datosIris.target
+
+print(f'\n OBJETIVO: dfIris["target"] \n {dfIris["target"]}')
+
+
+
+# D) variables independientes (array)
+caracteristicas = ['sepal length (cm)','sepal width (cm)']
+
+print(f'\n CARACTERISTICAS \n{caracteristicas}')
+
+print(f'\n dfIris[caracteristicas] \n {dfIris[caracteristicas]}')
+
+
+# E) VARIABLES X e Y (caracteriticas y objetivo)
+X= dfIris[caracteristicas]
+
+Y =dfIris['target']
+
+print(f'\n X \n{X}')
+print(f'\n Y \n{Y}')
+
+
+
+# F) TRAIN TEST SPLIT
+X_train,X_test,Y_train,Y_test= train_test_split(X,
+                                                Y,
+                                                test_size=0.2,
+                                                random_state=42)
