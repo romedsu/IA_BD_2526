@@ -644,6 +644,11 @@ import matplotlib.pyplot as plt
 # B)
 datosIris=datasets.load_iris()
 
+print(f'\n datosIris feature_names \n {datosIris.feature_names}')
+
+print(f'\n datosIris target_names \n {datosIris.target_names}')
+
+print(f'\n datosIris KEYS \n {datosIris.keys()}')
 
 
 # C) CREAR DATASET
@@ -800,8 +805,15 @@ print(f'\n Z: \n {Z}')
 
 
 # M) PLT (graficos)
+
+# gráficos de contorno rellenos
 plt.contourf(xx, yy, Z, alpha=0.3, cmap='viridis')
 
+
+# gráficos de dispersión 
+
+# [:, 0] --> fila 0 (1º)
+# [:, 0] --> fila 1 (2º)
 plt.scatter(escalaAjusteEntrenamiento[:, 0], 
             escalaAjusteEntrenamiento[:, 1], 
             c=Y_train, 
@@ -815,3 +827,188 @@ plt.title('Fronteras de Decisión: Regresión Logística (Iris)')
 
 plt.show()
 
+
+
+# %% 28
+
+'''
+28  Evalúa un modelo de Regresión Logística mediante validación cruzada para
+     clasificar las especies Iris utilizando el largo y el ancho del sépalo.
+     En este ejercicio vas a construir un modelo de clasificación supervisada 
+     utilizando el dataset load_iris() de scikit-learn. A diferencia del ejercicio 
+     anterior, no realizarás una única división en entrenamiento y prueba,
+     sino que evaluarás el modelo mediante validación cruzada con 5 pliegues 
+     para obtener una estimación más robusta de su rendimiento. Posteriormente,
+     entrenarás el modelo con todos los datos para visualizar la frontera de decisión.
+     
+     
+    a) Importa las siguientes librerías:
+        • numpy como np
+        • pandas como pd
+        • matplotlib.pyplot como plt
+        • load_iris desde sklearn.datasets
+        • cross_val_score desde sklearn.model_selection
+        • LogisticRegression desde sklearn.linear_model
+        • StandardScaler desde sklearn.preprocessing
+        
+    b) Carga el dataset Iris en una variable llamada datosIris utilizando datosIris = load_iris()
+    
+    
+    c) Crea un DataFrame llamado dfIris con las variables predictoras 
+        usando datosIris.data y los nombres de columnas usando datosIris.feature_names. 
+        Después añade una nueva columna llamada target usando dfIris['target'] = datosIris.target
+        
+        
+    d) Crea un array llamado caracteristicas con las siguientes variables independientes:
+        'sepal length (cm)' y 'sepal width (cm)'
+        
+        
+    e) Separa el conjunto de datos en variable X con dfIris[caracteristicas] y
+        variable y con dfIris['target']
+        
+        
+    f) Aplica una normalización utilizando StandardScaler. Crea una instancia
+        llamada scaler, ajusta y transforma todos los datos utilizando:
+            X_scaled = scaler.fit_transform(X)
+            
+            
+    g) Crea la variable modelo como una instancia de LogisticRegression().
+
+'''
+
+# A)
+    
+import numpy as np
+
+import pandas as pd
+
+import matplotlib.pyplot as plt
+
+# from sklearn.datasets import load_iris
+
+from sklearn.model_selection import cross_val_score
+
+from sklearn.linear_model import LogisticRegression
+
+from sklearn.preprocessing import StandardScaler
+
+
+#  B)
+
+datosIris = load_iris()
+
+
+# C)
+dfIris= pd.DataFrame(datosIris.data,
+                     columns=datosIris.feature_names)
+
+    # nueva columna OBJETIVO
+dfIris['target']=datosIris.target
+
+
+
+# D) CARACTERISTICAS
+
+caracteristicas = ['sepal length (cm)','sepal width (cm)']
+
+
+# E)
+X = dfIris[caracteristicas]
+
+Y =dfIris['target']
+
+
+# F)STANDAR SCALER
+# media de 0 y una desviación estándar de 1
+
+scaler= StandardScaler()
+
+    # SOLO 1 DATO POR FIT_TRANSFORM
+X_scaled =scaler.fit_transform(X)
+
+
+
+
+# G) MODELO  --> LogisticRegression()
+
+modelo= LogisticRegression()
+
+modelo.fit(X_scaled,Y)
+
+
+'''
+h) Realiza una validación cruzada con 5 pliegues utilizando 
+    cv_accuracy = cross_val_score(modelo, X_scaled, y, cv=5, scoring='accuracy')
+    Muestra por pantalla: El vector de precisiones obtenido en cada pliegue y
+    la precisión media calculada mediante np.mean(cv_accuracy)
+    
+    
+i) Entrena el modelo con todos los datos escalados utilizando modelo.fit(X_scaled, y)
+    
+    
+j) Visualización de la frontera de decisión:
+    • Calcula los valores mínimos y máximos de cada característica usando X_scaled[:, 0] y X_scaled[:, 1]
+    
+    • Crea una malla de puntos usando np.meshgrid()
+    
+    • Predice las clases sobre la malla utilizando: 
+        Z = modelo.predict(np.c_[xx.ravel(), yy.ravel()])
+        Z = Z.reshape(xx.shape)
+        
+        
+k) Representa gráficamente:
+    • La superficie de decisión usando plt.contourf()
+    
+    • Los puntos reales del dataset usando plt.scatter()
+    
+    • Añade etiquetas a los ejes con plt.xlabel() y plt.ylabel()
+    
+    • Añade un título con plt.title()
+    
+    • Muestra la figura con plt.show()
+'''
+
+
+# H) VALIDACION CRUZADA
+
+cv_accuracy = cross_val_score(modelo, X_scaled, Y, cv=5, scoring='accuracy')
+
+print(f"\n Vector de precisiones (cada pliegue): \n {cv_accuracy}")
+
+precisionMedia= np.mean(cv_accuracy)
+
+print(f"\n PRECISION MEDIA: \n {precisionMedia}")
+
+
+
+
+# I FRONTERA de DECISION (sobre el escalado (standarScaler) del X_scaled)
+
+x_min, x_max = X_scaled[:, 0].min() - 1, X_scaled[:, 0].max() + 1
+
+
+y_min, y_max = X_scaled[:, 1].min() - 1, X_scaled[:, 1].max() + 1
+
+
+    #  MALLA DE PUNTOS
+xx, yy = np.meshgrid(np.linspace(x_min, x_max, 200), np.linspace(y_min, y_max, 200))
+
+    # PREDICCION CLASES sobre malla 
+Z = modelo.predict(np.c_[xx.ravel(), yy.ravel()])
+Z = Z.reshape(xx.shape)
+ 
+
+
+# K) GRAFICOS
+
+plt.contourf(xx,yy,Z, alpha=0.3)
+
+plt.scatter(X_scaled[:,0],
+            X_scaled[:,1],
+            c=Y)
+
+plt.xlabel('Sépalo largo')
+plt.ylabel('Sépalo ancho')
+plt.title('REGRESIÓN LOGÍSTICA: VALIDACIÓN CRUZADA')
+
+plt.show()
