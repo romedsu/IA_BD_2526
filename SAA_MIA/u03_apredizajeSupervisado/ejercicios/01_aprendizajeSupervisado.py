@@ -1,3 +1,4 @@
+# %% EJERCICIO 1
 # -*- coding: utf-8 -*-
 """
 Created on Thu Jan  8 11:05:43 2026
@@ -541,9 +542,9 @@ X_train_scaler =scaler.fit_transform(X_train)
 # sin fit el de X_TEST (solo transform)
 X_test_scaler =scaler.transform(X_test)
 
-# print(X_train_std)
+print(X_train_scaler)
 
-# print(X_test_std)
+print(X_test_scaler)
 
 
 
@@ -558,8 +559,8 @@ modelo.fit(X_train_scaler,Y_train)
 
 w = modelo.coef_ 
 b = modelo.intercept_ 
-print(f"\nPrimer coeficiente (w1): {w[0]}") 
-print(f"Intercepto (b): {b}")
+print(f"\nPESOS - Primer coeficiente (w1): {w[0]}") 
+print(f"SESGO - Intercepto (b): {b}")
 
 
 
@@ -567,14 +568,14 @@ print(f"Intercepto (b): {b}")
 
 prediccionTest = modelo.predict(X_test_scaler)
 
-# %% J
+# %% J - ERROR CUADRÁTICO MEDIO
 mse = mean_squared_error(Y_test,prediccionTest)
 
 
 print(f'\n MSE \n{mse}')
 
 
-# %% K
+# %% K - COEFICIENTE DE DETERMINACIÓN (R²)
 
 coef_determinacion =r2_score(Y_test,prediccionTest)
 
@@ -1012,3 +1013,234 @@ plt.ylabel('Sépalo ancho')
 plt.title('REGRESIÓN LOGÍSTICA: VALIDACIÓN CRUZADA')
 
 plt.show()
+
+
+
+
+# %% EJERCICIO 29
+
+'''
+29 Clasificación de tumores de cáncer de mama utilizando Regresión Logística 
+    con todas las características
+    
+    En este ejercicio vas a construir un modelo de clasificación binaria para 
+    predecir si un tumor de mama es benigno o maligno utilizando todas las 
+    características disponibles en el dataset de cáncer de mama de scikit-learn.
+    Dividirás los datos en conjuntos de entrenamiento y prueba, estandarizarás
+    las características para mejorar el rendimiento del modelo, y evaluarás 
+    la calidad del clasificador mediante múltiples métricas incluyendo accuracy,
+    precision, sensibilidad, F1-score y la matriz de confusión.
+    
+    
+    a) Importa las bibliotecas necesarias: pandas como pd, load_breast_cancer
+    desde sklearn.datasets, train_test_split desde sklearn.model_selection, 
+    LogisticRegression desde sklearn.linear_model, 
+    StandardScaler desde sklearn.preprocessing, 
+    y las métricas confusion_matrix, accuracy_score, 
+    precision_score, recall_score y f1_score desde sklearn.metrics.
+    
+    
+    b) Carga el conjunto de datos de cáncer de mama en una variable
+    llamada datosCancer utilizando load_breast_cancer(). 
+    Este dataset contiene mediciones de características 
+    de núcleos celulares presentes en imágenes de biopsias de mama.
+    
+    
+    c) Crea un DataFrame llamado dfCancer con todas las características
+    utilizando datosCancer.data como datos y datosCancer.feature_names
+    como nombres de columnas. 
+    Añade una nueva columna llamada 'target' al DataFrame asignándole
+    los valores de datosCancer.target, donde 0 representa tumores malignos
+    y 1 representa tumores benignos.
+    
+    
+    
+    d) Análisis del dataset
+    
+    •	 Muestra por pantalla los nombres de todas las características
+    del dataset usando datosCancer.feature_names.
+    ¿Cuántas características tiene el dataset?
+    
+
+    •	Muestra los nombres de las clases objetivo con datosCancer.target_names.
+    ¿Qué valor numérico corresponde a cada clase según lo que viste en el enunciado?
+    
+    
+    •	Muestra las primeras 5 filas del dataset en formato array con 
+    datosCancer.data[:5] para hacerte una idea de los valores numéricos que contiene.
+    
+    
+    •	Una vez creado el DataFrame dfCancer (apartado c), 
+    muestra sus primeras filas con .head() y consulta su estructura con .info()
+    o .describe(). ¿Qué tipo de datos contiene? ¿Hay valores nulos?
+    
+    
+    •	Muestra cuántos tumores malignos (0) y cuántos benignos (1)
+    hay en el dataset usando .value_counts() sobre la columna target. 
+    ¿Está el dataset balanceado?
+    
+'''
+# a)
+import pandas as pd
+
+from sklearn.datasets import load_breast_cancer
+
+from sklearn.model_selection import train_test_split
+
+from sklearn.linear_model import LogisticRegression
+
+from sklearn.preprocessing import StandardScaler
+
+from sklearn.metrics import (
+    confusion_matrix,
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score
+)
+
+
+# b) CARGAR DATOS
+datosCancer= load_breast_cancer()
+
+
+#  c) DATAFRAME - OBJETIVO
+dfCancer = pd.DataFrame(datosCancer.data,
+                        columns=datosCancer.feature_names)
+
+
+dfCancer['target']=datosCancer.target
+# print(dfCancer['target'])
+
+# d) ANÁLISIS del DATASET
+
+# • Nombres de las características y cantidad
+print("Nombres de las características:")
+print(datosCancer.feature_names)
+print(f"\nEl dataset tiene {len(datosCancer.feature_names)} características.")
+
+
+# • Nombres de las clases objetivo y valores numéricos
+print(f"\nClases objetivo: {datosCancer.target_names}")
+# En este dataset: 0 corresponde a 'malignant' y 1 a 'benign'
+
+
+# • Primeras 5 filas en formato array
+print("\nPrimeras 5 filas (array):")
+print(datosCancer.data[:5])
+
+
+# • Visualización del DataFrame y estructura
+print("\nPrimeras filas del DataFrame:")
+print(dfCancer.head())
+
+
+print("\nInformación del DataFrame:")
+dfCancer.info()
+
+print("\nEstadísticas descriptivas:")
+print(dfCancer.describe())
+
+# • Conteo de clases (0 = maligno, 1 = benigno)
+conteo_clases = dfCancer['target'].value_counts()
+print("\nConteo de tipos de tumor:")
+print(conteo_clases)
+
+
+
+
+# PARTE 29 B
+
+'''
+e) Selecciona las variables predictoras creando la variable X que contenga 
+    todas las características del dataset usando dfCancer[datosCancer.feature_names]. 
+    Crea la variable y que contenga la columna objetivo con dfCancer['target'],
+    representando la clasificación benigno/maligno del tumor.
+    
+f) Divide el conjunto de datos en entrenamiento y prueba utilizando 
+    train_test_split() con X, y como entrada y los parámetros test_size=0.2 
+    y random_state=42.
+    
+g) Estandariza los datos creando una instancia de StandardScaler() llamada scaler.
+    Ajusta el escalador con los datos de entrenamiento y transfórmalos guardando
+    el resultado en X_train_scaled usando scaler.fit_transform(X_train).
+    Transforma el conjunto de prueba guardando el resultado en X_test_scaled
+    usando scaler.transform(X_test). La estandarización es crucial en regresión 
+    logística para que todas las características contribuyan equitativamente al modelo.
+    
+    
+h) Crea el modelo de Regresión Logística en una variable llamada modelo
+    utilizando LogisticRegression(). Entrena el modelo con los datos de
+    entrenamiento estandarizados usando modelo.fit(X_train_scaled, y_train).
+    
+i) Realiza predicciones sobre el conjunto de prueba utilizando modelo.predict(X_test_scaled)
+    y guarda el resultado en la variable y_pred.
+    
+j) Evalúa la calidad del modelo calculando múltiples métricas de clasificación. 
+    Calcula el accuracy usando accuracy_score(y_test, y_pred), la precision 
+    usando precision_score(y_test, y_pred), la sensibilidad (recall) usando
+    recall_score(y_test, y_pred), y el F1-score usando f1_score(y_test, y_pred).
+    Calcula también la matriz de confusión usando confusion_matrix(y_test, y_pred)
+    y guárdala en confusionMatrix.
+    
+k) Muestra por pantalla todas las métricas calculadas: accuracy, precision, 
+    sensibilidad y F1-score con sus respectivas etiquetas. Finalmente, 
+    muestra la matriz de confusión con un encabezado descriptivo que indique 
+    claramente qué métrica se está presentando.
+'''
+
+# e) VARIABLES PREDICTORAS Y OBJETIVO
+X = dfCancer[datosCancer.feature_names]
+y = dfCancer['target']
+
+
+# f) TRAIN TEST SPLIT | División del conjunto de datos (80% entrenamiento, 20% prueba)
+X_train, X_test, y_train, y_test = train_test_split(
+                                                    X, 
+                                                    y,
+                                                    test_size=0.2, 
+                                                    random_state=42)
+
+
+# g) ESTANDARIZACIÓN 
+scaler = StandardScaler()
+
+X_train_scaled = scaler.fit_transform(X_train)
+
+X_test_scaled = scaler.transform(X_test)
+
+
+# h) MODELO (Creación y entrenamiento)
+modelo = LogisticRegression()
+
+modelo.fit(X_train_scaled, y_train)
+
+
+# i) PREDICCIONES sobre el conjunto de prueba
+y_pred = modelo.predict(X_test_scaled)
+
+
+
+# j) Evaluación de la CALIDAD del modelo
+accuracy = accuracy_score(y_test, y_pred)
+
+precision = precision_score(y_test, y_pred)
+
+sensibilidad = recall_score(y_test, y_pred)
+
+f1 = f1_score(y_test, y_pred)
+
+confusionMatrix = confusion_matrix(y_test, y_pred)
+
+
+
+# K)  MÉTRICAS y MATRIZ DE CONFUSIÓN
+print("\n*** MÉTRICAS DE CLASIFICACIÓN ***\n---------------------------------")
+print(f"Accuracy (Exactitud):    {accuracy:.4f}")
+print(f"Precision (Precisión):  {precision:.4f}")
+print(f"Sensibilidad (Recall):   {sensibilidad:.4f}")
+print(f"F1-Score:               {f1:.4f}")
+
+
+print("\n*** MATRIZ DE CONFUSIÓN ***\n-------------------------")
+print(confusionMatrix) 
