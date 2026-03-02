@@ -830,7 +830,7 @@ plt.show()
 
 
 
-# %% 28
+# %% EJERCICIO 28
 
 '''
 28  Evalúa un modelo de Regresión Logística mediante validación cruzada para
@@ -1221,26 +1221,332 @@ y_pred = modelo.predict(X_test_scaled)
 
 
 
-# j) Evaluación de la CALIDAD del modelo
+# j) EVALUACIÓN de la CALIDAD del modelo
+
+    # EXACTITUD
 accuracy = accuracy_score(y_test, y_pred)
 
+    # PRECICSION
 precision = precision_score(y_test, y_pred)
 
+    # SENSIBILIDAD
 sensibilidad = recall_score(y_test, y_pred)
 
+    # F1_SCORE
 f1 = f1_score(y_test, y_pred)
 
+    # MATRIZ DE CONFUSIÓN
 confusionMatrix = confusion_matrix(y_test, y_pred)
 
 
 
 # K)  MÉTRICAS y MATRIZ DE CONFUSIÓN
 print("\n*** MÉTRICAS DE CLASIFICACIÓN ***\n---------------------------------")
-print(f"Accuracy (Exactitud):    {accuracy:.4f}")
-print(f"Precision (Precisión):  {precision:.4f}")
-print(f"Sensibilidad (Recall):   {sensibilidad:.4f}")
-print(f"F1-Score:               {f1:.4f}")
+print(f"Accuracy (Exactitud):    {accuracy:.4f}\n")
+print(f"Precision (Precisión):  {precision:.4f}\n")
+print(f"Sensibilidad (Recall):   {sensibilidad:.4f}\n")
+print(f"F1-Score:               {f1:.4f}\n")
 
 
 print("\n*** MATRIZ DE CONFUSIÓN ***\n-------------------------")
 print(confusionMatrix) 
+
+
+
+# %% EJERCICIO 30
+
+'''
+30 En este ejercicio vas a construir un modelo de clasificación supervisada 
+    utilizando el dataset de cáncer de mama de scikit-learn. A diferencia de 
+    realizar una única división en entrenamiento y prueba, evaluarás el modelo
+    mediante validación cruzada con 5 pliegues para obtener una estimación más 
+    robusta de su rendimiento utilizando únicamente dos características del dataset.
+    
+    
+    a) Importa las bibliotecas necesarias: numpy como np, pandas como pd, 
+    load_breast_cancer desde sklearn.datasets, cross_val_score desde sklearn.model_selection,
+    SVC desde sklearn.svm y StandardScaler desde sklearn.preprocessing.
+    
+    b) Carga el dataset de cáncer de mama en una variable llamada datosCancer
+    utilizando load_breast_cancer(). A continuación, crea un DataFrame llamado 
+    dfCancer con las variables predictoras usando datosCancer.data y los nombres
+    de columnas usando datosCancer.feature_names. Después añade una nueva columna
+    llamada 'target' con los valores de datosCancer.target.
+    
+    
+    c) Crea un array llamado caracteristicas que contenga las siguientes
+    dos variables independientes: 'mean radius' y 'mean texture'.
+    Estas serán las únicas características que utilizarás para entrenar el modelo.
+
+
+    d) Separa el conjunto de datos en la variable X que contenga dfCancer[caracteristicas]
+    y la variable y que contenga dfCancer['target'].
+    
+    
+    e) Aplica una normalización a los datos utilizando StandardScaler(). 
+        Crea una instancia llamada scaler, y luego ajusta y transforma todos 
+        los datos usando X_scaled = scaler.fit_transform(X).
+        
+        
+    f) Crea la variable modelo como una instancia de SVC(), que representa una 
+    Máquina de Vectores de Soporte con kernel por defecto.
+    
+    
+    g) Realiza una validación cruzada con 5 pliegues utilizando cross_val_score()
+    pasando como argumentos el modelo, los datos escalados X_scaled, la variable objetivo y,
+    el parámetro cv=5 y scoring='accuracy'. Guarda el resultado en la variable accuracyModelo.
+    
+    
+    h) Muestra por pantalla los resultados de la precisión obtenida en cada
+    uno de los 5 pliegues utilizando un bucle for con enumerate() que imprima
+    el número de iteración y la precisión correspondiente con un formato legible.
+    
+'''
+
+
+# a) BIBLIOTECAS
+
+import numpy as np
+
+import pandas as pd
+
+from sklearn.datasets import load_breast_cancer
+
+from sklearn.model_selection import cross_val_score
+
+from sklearn.svm import SVC
+
+from sklearn.preprocessing import StandardScaler
+
+# from sklearn.model_selection import train_test_split
+
+# from sklearn.linear_model import LogisticRegression
+
+# from sklearn.metrics import (
+#     confusion_matrix,
+#     accuracy_score,
+#     precision_score,
+#     recall_score,
+#     f1_score
+# )
+
+
+datosCancer = load_breast_cancer()
+
+dfCancer= pd.DataFrame(datosCancer.data,
+                       columns=datosCancer.feature_names)
+
+dfCancer['target']=datosCancer.target
+
+# c)
+caracteristicas =['mean radius','mean texture']
+
+
+
+# d) X e y
+X= dfCancer[caracteristicas]
+
+y= dfCancer['target']
+
+
+
+# e) NORMALIZACION
+
+scaler= StandardScaler()
+
+X_scaled = scaler.fit_transform(X)
+
+
+
+# f) SVC -modelo
+modelo = SVC()
+
+
+# g) VALIDACION CRUZADA
+#  cv --> pliegues
+accuracyModelo = cross_val_score(modelo, X_scaled, y, cv=5, scoring='accuracy')
+
+
+# h)
+for i, precision in enumerate(accuracyModelo, start=1):
+    print(f"i {i}: Precisión = {precision: .2f}")
+    
+    
+    
+# %% EJERCICIO 32
+
+'''
+32 Clasificación de valoraciones de reseñas utilizando K-Nearest Neighbors (KNN)
+    En este ejercicio vas a construir un modelo de clasificación supervisada
+    para predecir la puntuación en estrellas (Star Rating) de reseñas basándote 
+    en características textuales como el número de palabras y el valor de sentimiento. 
+    Utilizarás el algoritmo K-Nearest Neighbors (KNN), dividirás los datos en 
+    conjuntos de entrenamiento y prueba, normalizarás las características y 
+    evaluarás el rendimiento del modelo mediante diferentes métricas de clasificación.
+    
+        
+    a) Importa las bibliotecas necesarias: pandas como pd, train_test_split 
+    desde sklearn.model_selection, StandardScaler desde sklearn.preprocessing,
+    KNeighborsClassifier desde sklearn.neighbors, y las métricas accuracy_score,
+    classification_report y confusion_matrix desde sklearn.metrics.
+    
+    b) Carga el archivo CSV llamado 'reviews_sentiment.csv' en un DataFrame
+    llamado df utilizando pd.read_csv() con los parámetros delimiter=';' 
+    y encoding='utf-8'. Este dataset contiene información sobre reseñas de productos 
+    incluyendo el número de palabras, el valor de sentimiento y la puntuación en estrellas.
+    
+    c) Selecciona las columnas que servirán como características predictoras
+    creando la variable features que contenga las columnas 'wordcount' y 'sentimentValue'
+    del DataFrame. Luego crea la variable target que contenga la columna 'Star Rating',
+    que representa la puntuación que se quiere predecir.
+    
+    d) Divide el conjunto de datos en conjuntos de entrenamiento y prueba 
+    utilizando train_test_split() con features y target como entrada, y los
+    parámetros test_size=0.2 y random_state=42.
+    
+    
+    e) Normaliza los datos creando una instancia de StandardScaler() llamada scaler.
+    Ajusta el escalador con los datos de entrenamiento y transfórmalos guardando
+    el resultado en escalarAjustarEntrenamiento mediante scaler.fit_transform(X_train).
+    A continuación, transforma el conjunto de prueba guardando 
+    el resultado en escalarAjustarPrueba usando el método .transform(X_test).
+    
+    
+    f) Crea el modelo K-Nearest Neighbors en una variable llamada modeloKnn 
+    utilizando KNeighborsClassifier() con el parámetro n_neighbors=5, que 
+    indica que el modelo considerará los 5 vecinos más cercanos para realizar
+    la clasificación. Puedes ajustar este número según sea necesario para mejorar
+    el rendimiento.
+    
+    
+    g) Entrena el modelo utilizando modeloKnn.fit() con los datos de entrenamiento
+    escalados escalarAjustarEntrenamiento y las etiquetas y_train.
+    
+    
+    h) Realiza las predicciones sobre el conjunto de prueba utilizando
+    modeloKnn.predict(escalarAjustarPrueba) y guarda el resultado en la variable
+    prediccionesConjuntoPrueba.
+    
+    
+    i) Evalúa el rendimiento del modelo calculando la precisión (accuracy)
+    mediante accuracy_score(y_test, prediccionesConjuntoPrueba) y
+    guárdala en precisionAccuracy. Calcula la matriz de confusión usando
+    confusion_matrix(y_test, prediccionesConjuntoPrueba) y
+    guárdala en matrizConfusion. Genera el informe de clasificación 
+    completo utilizando classification_report(y_test, prediccionesConjuntoPrueba)
+    y guárdalo en classification_rep.
+    
+    
+    j) Muestra por pantalla la precisión del modelo, la matriz de confusión
+    con un encabezado descriptivo, y el informe de clasificación completo que
+    incluye métricas como precision, recall y f1-score para cada clase de puntuación.
+
+'''
+
+# a)
+
+import pandas as pd
+
+from sklearn.preprocessing import StandardScaler
+
+from sklearn.model_selection import train_test_split
+ 
+from sklearn.neighbors import KNeighborsClassifier
+
+from sklearn.linear_model import LogisticRegression
+
+from sklearn.metrics import (
+    confusion_matrix,
+    accuracy_score,
+    classification_report,
+    f1_score
+)
+
+
+# b)
+# ruta = r"C:\Users\Mañana\OneDrive - Consejería de Educación\Documentos\rm\SAA_MIA\u03_apredizajeSupervisado\ejercicios\datasets\reviews_sentiment.csv"
+
+ruta= ( 
+       r"C:\Users\Mañana\OneDrive - Consejería de Educación\Documentos\rm"
+       r"\SAA_MIA\u03_apredizajeSupervisado\ejercicios\datasets\reviews_sentiment.csv"
+    )
+
+df=pd.read_csv(ruta, delimiter=';',encoding='utf-8')
+
+print(df.head())
+
+
+# C)
+    # Variables predictoras - caracteristicas
+features = df[['wordcount', 'sentimentValue']]
+
+    # Variable objetivo
+target = df['Star Rating']
+
+
+
+# D) TRAIN TEST SPLIT
+X_train, X_test, y_train, y_test = train_test_split(
+    features,
+    target,
+    test_size=0.2,
+    random_state=42
+)
+
+
+# E) STANDAR SCALER
+scaler=StandardScaler()
+
+escalarAjustarEntrenamiento= scaler.fit_transform(X_train)
+
+escalarAjustarPrueba = scaler.transform(X_test)
+
+
+
+# F) CREAR MODELO KNN
+modeloKnn=KNeighborsClassifier(n_neighbors=5)
+
+
+
+# G) ENTRENAR MODELO KNN
+modeloKnn.fit(escalarAjustarEntrenamiento, y_train)
+ 
+ 
+# H) PREDICCIÓN
+prediccionesConjuntoPrueba= modeloKnn.predict(escalarAjustarPrueba)
+
+
+# I) EVALUACION
+
+    # PRECISION (accuracy)
+precisionAccuracy= accuracy_score(y_test, prediccionesConjuntoPrueba)
+
+    # MATRIZ CONFUSION
+matrizConfusion = confusion_matrix(y_test, prediccionesConjuntoPrueba)
+
+    # INFORME CLASIFICACION
+classification_rep= classification_report(y_test, prediccionesConjuntoPrueba)
+
+# f1 = f1_score(y_test, prediccionesConjuntoPrueba, average='weighted')
+
+
+
+
+
+# J) IMPRESIÓN x pantalla
+print("\n*** MÉTRICAS DE CLASIFICACIÓN ***\n---------------------------------")
+print(f"Accuracy (precisión):    {precisionAccuracy:.4f}\n")
+
+# print(f"F1-Score: {f1:.4f}\n")
+
+
+
+print("\n*** MATRIZ DE CONFUSIÓN ***\n-------------------------")
+print(matrizConfusion) 
+
+
+
+print("\n*** INFORME DE CLASIFICACIÓN ***\n---------------------------------")
+# INFORME DE CLASIFICACIÓN  -->  precision    recall  f1-score   support
+print(classification_rep)
+
