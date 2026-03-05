@@ -1550,3 +1550,181 @@ print("\n*** INFORME DE CLASIFICACIÓN ***\n---------------------------------")
 # INFORME DE CLASIFICACIÓN  -->  precision    recall  f1-score   support
 print(classification_rep)
 
+
+
+# %% EJERCICIO 33
+
+'''
+33 Comparación de estrategias de ponderación en K-Nearest Neighbors para regresión
+
+    En este ejercicio vas a construir y comparar dos modelos de regresión utilizando
+    el algoritmo K-Nearest Neighbors (KNN) con diferentes estrategias de ponderación.
+    Generarás datos sintéticos basados en la función seno con ruido añadido,
+    entrenarás dos modelos KNN (uno con pesos uniformes y otro con pesos basados
+     en distancia), y visualizarás gráficamente 
+    las diferencias entre ambas estrategias para observar cómo influyen en las predicciones.
+    
+    
+    a) Importa las bibliotecas necesarias: numpy como np, matplotlib.pyplot como plt,
+    y KNeighborsRegressor desde sklearn.neighbors.
+     
+    
+    b) Genera los datos de entrenamiento estableciendo primero una semilla aleatoria
+    con np.random.seed(0) para reproducibilidad. Crea la variable X generando 40 
+    valores aleatorios entre 0 y 5 usando np.sort(5 * np.random.rand(40, 1), axis=0) 
+    para mantenerlos ordenados. Genera la variable y aplicando la función seno a X
+    mediante np.sin(X).ravel(). Añade ruido a algunos puntos de y modificando cada 
+    quinto elemento con y[::5] += 1 * (0.5 - np.random.rand(8)) para simular datos 
+    reales con irregularidades.
+     
+    c) Genera un conjunto de datos de prueba llamado conjuntoPrueba creando
+    500 puntos equiespaciados entre 0 y 5 utilizando np.linspace(0, 5, 500)[:, np.newaxis].
+    Este conjunto servirá para visualizar las predicciones del modelo de forma continua.
+    
+     
+
+    d) Crea dos modelos de regresión KNN con diferentes estrategias de ponderación. 
+    El primero, llamado modeloUniform, debe usar KNeighborsRegressor() con n_neighbors=5 
+    y weights='uniform', donde todos los vecinos tienen el mismo peso. 
+    El segundo, llamado modeloDistance, debe usar los mismos parámetros
+    excepto weights='distance', donde los vecinos más cercanos tienen 
+    mayor influencia en la predicción.
+    
+     
+    e) Ajusta ambos modelos a los datos de entrenamiento utilizando modeloUniform.fit(X, y)
+    y modeloDistance.fit(X, y).
+     
+    f) Realiza predicciones sobre el conjunto de prueba para ambos modelos. 
+    Guarda las predicciones del modelo con pesos uniformes en prediccionUniform 
+    usando modeloUniform.predict(conjuntoPrueba), y las predicciones del modelo
+    con pesos basados en distancia en prediccionDistance usando modeloDistance.predict(conjuntoPrueba).
+     
+    g) Visualiza los resultados creando una figura de tamaño (12, 6)
+    con plt.figure(figsize=(12, 6)). Representa los datos de entrenamiento
+    como puntos de dispersión usando plt.scatter() con color 'darkorange' 
+    y etiqueta 'Datos de entrenamiento'. Dibuja las predicciones 
+    del modelo uniforme con plt.plot() usando color 'blue' y etiqueta 'Predicciones Uniform', 
+    y las predicciones del modelo con pesos por distancia con color 'green'
+    y etiqueta 'Predicciones Distance'.
+    
+     
+    h) Añade etiquetas a los ejes usando plt.xlabel('X') y plt.ylabel('y'),
+    un título descriptivo con plt.title('Regresión con K vecinos más próximos'),
+    muestra la leyenda con plt.legend(), y finalmente visualiza el gráfico con plt.show().
+
+'''
+
+
+# a)
+
+import numpy as np
+
+import pandas as pd
+
+import matplotlib.pyplot as plt
+
+from sklearn.neighbors import KNeighborsRegressor
+
+from sklearn.preprocessing import StandardScaler
+
+from sklearn.model_selection import train_test_split
+ 
+from sklearn.neighbors import KNeighborsClassifier
+
+from sklearn.linear_model import LogisticRegression
+
+from sklearn.metrics import (
+    confusion_matrix,
+    accuracy_score,
+    classification_report,
+    f1_score
+)
+
+
+# b) ALEATORIO
+
+    # semilla (para que nº aleatroios siempre sean los mismos)
+np.random.seed(0)
+
+    # X --> variable independiente (datos de entradas - caracteristicas)
+X= np.sort(5 * np.random.rand(40, 1), axis=0) 
+
+    # y --> variable dependiente (salida que queremos predecir)
+y= np.sin(X).ravel()
+
+
+    # ruido (para wue la curva no sea perfecta)
+y[::5] += 1 * (0.5 - np.random.rand(8))
+
+
+# C) CONJUNTO de PRUEBA (500 puntos espaciados entre 0 y 5)
+conjuntoPrueba = np.linspace(0, 5, 500)[:, np.newaxis]
+
+
+
+
+# D) MODELO KNN
+# se define el modelo, el cual aprende de los 5 puntos vecinos más próximos
+
+# weights='uniform' --> todos los puntos vecinos valen lo mismo
+# weights='distance' --> Cuanto más cerca, más valor tienen
+
+modeloUniform= KNeighborsRegressor(n_neighbors=5 , weights='uniform')
+
+modeloDistance= KNeighborsRegressor(n_neighbors=5 , weights='distance')
+
+
+
+#  E) ENTRENAMIENTO
+modeloUniform.fit(X, y)
+
+modeloDistance.fit(X, y)
+
+
+# F) PREDICCIONES
+prediccionUniform= modeloUniform.predict(conjuntoPrueba)
+
+prediccionDistance = modeloDistance.predict(conjuntoPrueba)
+
+
+# G) VISUALIZACIÓN
+
+plt.figure(figsize=(12, 6))
+
+    # scatter --> gráfica de dispersión (puntos individuales, sin unión)
+        # datos que conocemos
+plt.scatter(X, y, color='darkorange', label='Datos de entrenamiento')
+
+
+    # plot --> gráfica de linea (puntos conectados por una linea) una linea
+        # predicción
+plt.plot(conjuntoPrueba, prediccionUniform, color='blue', label='Predicciones Uniform')
+
+plt.plot(conjuntoPrueba, prediccionDistance, color='green', label='Predicciones Distance')
+
+
+plt.xlabel('X')
+plt.ylabel('y')
+plt.title('Regresión con K vecinos más próximos')
+
+plt.legend()
+
+plt.show()
+
+
+
+
+'''
+# ejercicio 27
+
+plt.scatter(escalaAjusteEntrenamiento[:, 0], 
+            escalaAjusteEntrenamiento[:, 1], 
+            c=Y_train, 
+            edgecolors='k', 
+            cmap='viridis')
+
+
+plt.xlabel('Sepal length (estandarizado)')
+plt.ylabel('Sepal width (estandarizado)')
+plt.title('Fronteras de Decisión: Regresión Logística (Iris)')
+'''
