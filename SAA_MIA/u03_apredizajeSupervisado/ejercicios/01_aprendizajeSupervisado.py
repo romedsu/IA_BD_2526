@@ -1728,3 +1728,78 @@ plt.xlabel('Sepal length (estandarizado)')
 plt.ylabel('Sepal width (estandarizado)')
 plt.title('Fronteras de Decisión: Regresión Logística (Iris)')
 '''
+
+
+
+# %% EJERCICIO 33
+
+'''
+34 Comparación de Árboles de Decisión con y sin limitación de profundidad
+    En este ejercicio vas a construir y comparar dos modelos de clasificación 
+    utilizando árboles de decisión con diferentes configuraciones. Utilizarás
+    el dataset Iris de scikit-learn para entrenar un árbol de decisión con 
+    profundidad máxima limitada y otro sin restricciones, y visualizarás 
+    gráficamente ambos árboles para comparar su complejidad y estructura,
+    observando cómo la profundidad afecta al overfitting y la interpretabilidad del modelo.
+    
+    
+    a) Importa las librerías necesarias: load_iris desde sklearn.datasets,
+    train_test_split desde sklearn.model_selection, DecisionTreeClassifier 
+    desde sklearn.tree, tree desde sklearn, y matplotlib.pyplot como plt.
+    
+    
+    b) Carga el conjunto de datos Iris en una variable llamada datosIris
+    utilizando load_iris(). Extrae las características en la variable X 
+    usando datosIris.data y las etiquetas en la variable y usando datosIris.target.
+    
+    
+    c) Divide el conjunto de datos en entrenamiento y prueba utilizando 
+    train_test_split() con los parámetros test_size=0.2 y random_state=42. 
+    Guarda los resultados en las variables X_train, X_test, y_train, y_test.
+    
+    d) Crea el primer clasificador de árbol de decisión llamado arbolDepth3
+    utilizando DecisionTreeClassifier() con el parámetro max_depth=3 para limitar
+    la profundidad máxima del árbol a 3 niveles. Esto ayudará a prevenir el 
+    sobreajuste y mantendrá el modelo más simple e interpretable. Entrena este
+    clasificador utilizando arbolDepth3.fit(X_train, y_train).
+    
+'''
+
+# a)
+import numpy as np
+import pandas as pd
+
+from sklearn.datasets import load_iris
+
+from sklearn.model_selection import train_test_split
+
+from sklearn.tree import DecisionTreeClassifier
+
+import matplotlib.pyplot as plt
+
+# b)
+datosIris= load_iris()
+
+print(datosIris.keys())
+# print(datosIris.DESCR)
+
+
+X= datosIris.data
+
+y= datosIris.target
+
+
+# c) TRAIN TEST SPLIT
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    y,
+                                                    test_size=0.2,
+                                                    random_state=42)
+
+
+# d) ARBOL DE DECISIÓN
+# max_depth=3 --> Altura - profundidad  del arbol en 3
+    # Si el nº es muy alto --> overfitting o sobreajuste (aprende de memoria)
+
+arbolDepth3= DecisionTreeClassifier(max_depth=3)
+
+arbolDepth3.fit(X_train, y_train)
