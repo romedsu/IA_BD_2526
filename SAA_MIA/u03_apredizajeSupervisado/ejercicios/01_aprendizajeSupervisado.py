@@ -1763,6 +1763,42 @@ plt.title('Fronteras de Decisión: Regresión Logística (Iris)')
     sobreajuste y mantendrá el modelo más simple e interpretable. Entrena este
     clasificador utilizando arbolDepth3.fit(X_train, y_train).
     
+    
+    e) Crea el segundo clasificador de árbol de decisión llamado arbolSinDepth 
+    utilizando DecisionTreeClassifier() sin ningún parámetro adicional,
+    lo que permitirá que el árbol crezca hasta su máxima profundidad posible
+    según los datos. 
+    Entrena este clasificador utilizando arbolSinDepth.fit(X_train, y_train).
+    
+
+    f) Crea una figura de visualización con tamaño (25, 10) 
+    usando plt.figure(figsize=(25, 10)) para mostrar ambos árboles
+    lado a lado de manera clara y legible.
+    
+    
+    g) Visualiza el primer árbol creando un subplot en la posición (1, 2, 1)
+    con plt.subplot(1, 2, 1). Añade un título "Árbol de decisión con Depth=3"
+    con fontsize=16. Dibuja el árbol utilizando tree.plot_tree() pasando como 
+    argumentos arbolDepth3, los nombres de características 
+    con feature_names=datosIris.feature_names, los nombres de clases 
+    con class_names=list(datosIris.target_names), filled=True para colorear
+    los nodos, fontsize=10, impurity=False para no mostrar la impureza, 
+    y rounded=True para nodos redondeados. Añade una etiqueta en el eje x 
+    con "Árbol con Depth=3" y fontsize=30, y un texto adicional "Depth=3" 
+    centrado sobre el gráfico usando plt.text() con las coordenadas y transformación apropiadas.
+    
+    
+    h) Visualiza el segundo árbol creando un subplot en la posición (1, 2, 2) 
+    con plt.subplot(1, 2, 2). Añade un título "Árbol de decisión sin parámetros 
+    adicionales" con fontsize=16. Dibuja el árbol utilizando tree.plot_tree()
+    con los mismos parámetros que el árbol anterior pero pasando arbolSinDepth 
+    como primer argumento. Añade una etiqueta en el eje x con "Árbol sin parámetros"
+    y fontsize=30, y un texto adicional "Sin parámetros" centrado sobre el gráfico.
+    
+    
+    i) Ajusta el espaciado entre los subplots para evitar superposiciones
+    usando plt.tight_layout(), y finalmente muestra la visualización completa con plt.show().
+    
 '''
 
 # a)
@@ -1776,6 +1812,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
 import matplotlib.pyplot as plt
+
+from sklearn import tree
+
 
 # b)
 datosIris= load_iris()
@@ -1803,3 +1842,62 @@ X_train, X_test, y_train, y_test = train_test_split(X,
 arbolDepth3= DecisionTreeClassifier(max_depth=3)
 
 arbolDepth3.fit(X_train, y_train)
+
+
+
+# E) ARBOL DE DECISIÓN (SIN PROFUNDIDAD)
+
+arbolSinDepth = DecisionTreeClassifier()
+
+arbolSinDepth.fit(X_train, y_train)
+
+
+# F) VISUALIZACIÓN
+
+plt.figure(figsize=(25,10))
+
+
+# G) 1er ARBOL
+
+plt.subplot(1, 2, 1)
+
+plt.title(label="Árbol de decisión con Depth=3", fontsize=16)
+
+tree.plot_tree(arbolSinDepth ,
+               feature_names=datosIris.feature_names,
+               class_names=list(datosIris.target_names),
+               filled=True,
+               fontsize=10, 
+               impurity=False,
+               rounded=True)
+
+
+plt.xlabel("Árbol con Depth=3",fontsize=30)
+
+plt.text(0.5, 1.02, "Depth=3", fontsize=12)
+
+# plt.show()
+
+
+
+# H) 2º ARBOL
+
+plt.subplot(1, 2, 2)
+
+plt.title(label="Árbol de decisión sin parámetros adicionales", fontsize=16)
+
+tree.plot_tree(arbolDepth3,
+               feature_names=datosIris.feature_names,
+               class_names=list(datosIris.target_names),
+               filled=True,
+               fontsize=10, 
+               impurity=False,
+               rounded=True)
+
+
+plt.xlabel("Árbol sin parámetros",fontsize=30)
+
+plt.text(0.5, 1.02, "Sin parámetros", fontsize=12)
+
+
+# I)
